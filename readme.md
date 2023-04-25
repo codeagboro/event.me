@@ -1,4 +1,0 @@
-client_secret=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
-
-
-CLIENTID=449782165591-v2il3btl4jotbc2sq73j5ir5q8mlj09n.apps.googleusercontent.com
