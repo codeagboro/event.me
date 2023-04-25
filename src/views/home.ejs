@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+<!-- Bootstrap JavaScript -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="styles.css">
+    <title>OAuth Tut</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">OAuth Tut</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <% if (user){ %>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/logout">Logout</a>
+                    </li>
+                <% }  else { %>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/login">Login</a>
+                    </li>
+                <%}%>
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home page</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/profile">Profile</a>
+                </li>
+            </ul>
+        </div>
+    </nav>    
+    <header class="jumbotron jumbotron-fluid text-center">
+        <div class="container">
+            <h1 class="display-4">OAuth Tutorial</h1>
+        </div>
+    </header>
+    
+    <main class="container mt-5">
+        <p class="lead">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus interdum ullamcorper erat, a dictum nulla dignissim auctor. Suspendisse commodo lectus at ex elementum, non efficitur nibh blandit. Praesent dictum convallis quam nec blandit. Suspendisse potenti. In vitae enim ut metus maximus consectetur non non magna. Sed sed turpis et eros egestas facilisis. Aenean lacinia rutrum ligula ut imperdiet. Ut sit amet commodo urna. Nunc mollis sapien id sapien commodo, sed consequat elit viverra. Pellentesque commodo id mi eu bibendum. Aliquam a ex in augue eleifend interdum. Nam porttitor, ex nec malesuada sodales, tellus felis fringilla tortor, vel rhoncus velit velit ac nisi. Sed nec felis eget nisl luctus varius id at dui.</p>
+    </main>
+    
+</body>
+</html>
