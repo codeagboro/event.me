@@ -6,14 +6,16 @@ const Transaction = require("../models/payment.model");
 const User = require("../models/user.model");
 const uuid = require("uuid");
 const Event = require("../../auth/models/event.model");
+const nodemailer = require("nodemailer");
 
 exports.booking = async (req, res) => {
   try {
     const { email, name, numberOfTickets } = req.body;
 
-    const event = await Event.findOne ({ name });
+    const event = await Event.findOne({ name });
 
-    const totalAmount = parseFloat(event.ticketAmount) * parseInt(numberOfTickets);
+    const totalAmount =
+      parseFloat(event.ticketAmount) * parseInt(numberOfTickets);
 
     const newBooking = await Booking.create({
       email,
@@ -26,7 +28,6 @@ exports.booking = async (req, res) => {
       message: "Booking successful",
       data: newBooking,
     });
-
   } catch (err) {
     console.error(err);
     res.status(500).send({ message: "Internal server error" });
@@ -55,9 +56,7 @@ exports.getEvents = async (req, res) => {
 exports.payment = async (req, res) => {
   try {
     const { bookingId } = req.body;
-    const booking = await Booking.findOne({bookingId});
-    
-    console.log({booking});
+    const booking = await Booking.findOne({ bookingId });
 
     const ref = uuid.v4();
 
@@ -88,6 +87,7 @@ exports.payment = async (req, res) => {
         },
       }
     );
+    console.log(response);
 
     res.send(response.data);
   } catch (err) {
@@ -96,48 +96,76 @@ exports.payment = async (req, res) => {
   }
 };
 
-exports.verifyPayment = async (req, res) => {
+// use axios to make a post request to the flutterwave api to confirm payment
+exports.confirmPayment = async (req, res) => {
   try {
-    const tx_ref = req.params.tx_ref;
-    const transaction = await Transaction.findOne({ tx_ref });
+    const secretHash = process.env.FLW_SECRET_HASH;
+    const signature = req.headers["verif-hash"];
 
-    if (transaction) {
-      return res.status(409).json({
-        message: "This transaction has already been processed",
-      });
+    if (!signature || signature !== secretHash) {
+      // This request isn't from Flutterwave; discard
+      res.status(401).end();
     }
 
-    if (response.data.status === "successful") {
+    const payload = req.body;
+
+    if (payload.status === "successful") {
       const newTransaction = await Transaction.create({
-        tx_ref,
-        transaction_id,
+        tx_ref: payload.tx_ref,
+        amount: payload.amount,
+        currency: payload.currency,
+        status: payload.status,
+        payment_type: payload.payment_type,
+        email: payload.customer.email,
+        name: payload.customer.fullName,
       });
 
-      return res.status(200).json({
-        message: "Payment successful",
-        data: newTransaction,
+      Booking.find({ email: payload.customer.email }).then((bookings) => {
+        const doc = new jsPDF();
+
+        bookings.forEach((booking, index) => {
+          doc.text(`Booking ${index + 1}:`, 10, 10 + index * 20);
+          doc.text(`Name: ${booking.email}`, 10, 20 + index * 20);
+          doc.text(`Check-in: ${booking.numberOfTickets}`, 10, 30 + index * 20);
+          doc.text(`Check-out: ${booking.totalAmount}`, 10, 40 + index * 20);
+        });
+
+        const pdfBuffer = doc.output();
+
+        const transporter = nodemailer.createTransport({
+          service: process.env.SMTP_HOST,
+          auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASSWORD,
+          },
+        });
+
+        const mailOptions = {
+          from: "events.me <events.me@gmail.com>",
+          to: payload.customer.email,
+          subject: "Booking successful",
+          html: `<h1>Hello ${payload.customer.fullName},</h1><p>Attached to this email are details of the event you booked</p>`,
+          attachments: [
+            {
+              filename: "bookings.pdf",
+              content: pdfBuffer,
+              contentType: "application/pdf",
+            },
+          ],
+        };
+
+        transporter.sendMail(mailOptions);
+
+        res.status(200).json({
+          message: "Payment successful",
+          data: newTransaction,
+        });
       });
     }
   } catch (err) {
     console.error(err);
-    res.status(500).send({ message: "Internal server error" });
-  }
-};
-
-exports.confirmpayment =  async (req, res) => {
-  if (req.query.status === 'successful') {
-      const transactionDetails = await Transaction.find({ref: req.query.tx_ref});
-      const response = await flw.Transaction.verify({id: req.query.transaction_id});
-      if (
-          response.data.status === "successful"
-          && response.data.amount === transactionDetails.amount
-          && response.data.currency === "NGN") {
-            const newTransaction = await Transaction.create({
-              tx_ref,
-              transaction_id,
-            })
-      } else {
-          // Inform the customer their payment was unsuccessful
-      }
+    return res.status(500).json({
+      message: "Internal server error",
+    });
   }
 };

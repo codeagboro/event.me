@@ -15,6 +15,7 @@ const createEvent = async (req, res) => {
                 message: "This event name is already in use, please choose another name",
             });
         }
+
         cloudinary.config({
             cloud_name: process.env.CLOUD_NAME,
             api_key: process.env.API_KEY,
@@ -53,3 +54,4 @@ const createEvent = async (req, res) => {
 };
 
 module.exports = createEvent;
+

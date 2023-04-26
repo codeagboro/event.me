@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const ensureAuthenticated = require("../../middleware/isLoggedIn");
+const isAuthenticated = require("../../middleware/isLoggedIn");
 const upload = require("../../helper/multer");
 const createEvent = require("../controller/auth.controller");
 
@@ -9,11 +9,11 @@ router.get("/newevent", (req, res) => {
     res.render("newevent");
 });
 
-router.get("/profile", ensureAuthenticated, (req, res) => {
+router.get("/profile", isAuthenticated, (req, res) => {
     res.render("profile", { user: req.user });
 });
 
-router.get("/logout", (req, res) => {
+router.get("/logout", isAuthenticated, (req, res) => {
     req.logout();
     res.redirect("/");
 });

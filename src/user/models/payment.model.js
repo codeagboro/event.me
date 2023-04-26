@@ -7,23 +7,23 @@ const transactionSchema = new mongoose.Schema(
       type: String,
     },
     amount: {
-      // storing the google id for first time users and storing it for second time user
       type: String,
     },
     currency: {
       type: String,
       default: "NGN",
     },
-    booking_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Booking",
-      required: true,
+    status: {
+      type: String,
     },
-    booking: {
-      type: String
+    payment: {
+      type: String,
     },
-    transaction_id: {
-      type: String
+    email: {
+      type: String,
+    },
+    name: {
+      type: String,
     },
   },
   {

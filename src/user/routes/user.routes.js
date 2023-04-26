@@ -1,6 +1,6 @@
 const express = require("express");
 const passport = require("passport");
-const { payment, verifyPayment, booking, getEvents } = require("../controller/controller");
+const { payment, confirmPayment, booking, getEvents } = require("../controller/controller");
 const router = express.Router();
 
 // Auth login
@@ -50,9 +50,10 @@ router.post("/payment", payment);
 
 router.post("/booking", booking);
 
+// route for pagination
 router.get("/events", getEvents);
 
-router.get("/verify/:tx_ref", verifyPayment);
+router.post("/confirm-payment", confirmPayment);
 
 const userRoute = router
 module.exports = userRoute;
